@@ -2,9 +2,6 @@
    Wolfgang Sourdeau, March 2013
    Copyright (c) 2013 Datacratic.  All rights reserved. */
 
-#include <sstream>
-#include <limits>
-#include <cmath>
 
 #include "rtbkit/common/account_key.h"
 #include "rtbkit/common/currency.h"
@@ -252,15 +249,8 @@ handleWinRq(const HttpHeader & header,
      *  If null, we return an error response.
      */
     if (json.isMember("price")) {
-      winPriceDbl = json["price"].asDouble();
-      //std::cerr <<"winPriceDbl: " << winPriceDbl;
-      winPriceDbl = round(winPriceDbl*1000.0) / 1000.0;
-      cerr.precision(std::numeric_limits<double>::max_digits10);
-      winPrice = USD_CPM(winPriceDbl);
-      //std::cerr <<", winPriceDbl (rounded): " << winPriceDbl;
-      //std::cerr <<", winPrice: " << winPrice << std::endl;
-      //std::cerr <<"winPrice.value: " << winPrice.value << std::endl;
-
+        winPriceDbl = json["price"].asDouble();
+        winPrice = USD_CPM(winPriceDbl);
     } else {
         errorResponseHelper(response,
                             "MISSING_WINPRICE",
@@ -292,7 +282,6 @@ handleWinRq(const HttpHeader & header,
     else {
         // Passback is optional
     }
-
 
     LOG(adserverTrace) << "{\"timestamp\":\"" << timestamp.print(3) << "\"," <<
         "\"bidRequestId\":\"" << bidRequestId << "\"," <<

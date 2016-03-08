@@ -69,16 +69,24 @@ setupOutputs(
     // The magic constants represent indexes in the received message.
     strategyOutput->logTo(
             "MATCHEDWIN",
-            logDir + "/%F/$(17)/$(5)/$(0)-%T.log.gz",
+            logDir + "/%F/$(17)/$(5)/$(0)-%T.log",
+            createMatchedWinFile);
+    strategyOutput->logTo(
+            "AUCTION",
+            logDir + "/%F/$(0)-%T.log",
+            createMatchedWinFile);
+    strategyOutput->logTo(
+            "BID",
+            logDir + "/%F/$(0)-%T.log",
             createMatchedWinFile);
     strategyOutput->logTo(
             "",
-            logDir + "/%F/$(10)/$(11)/$(0)-%T.log.gz",
+            logDir + "/%F/$(10)/$(11)/$(0)-%T.log",
             createMatchedWinFile);
 
     logger.addOutput(
             strategyOutput,
-            boost::regex("MATCHEDWIN|MATCHEDIMPRESSION|MATCHEDCLICK"));
+            boost::regex("MATCHEDWIN|MATCHEDIMPRESSION|MATCHEDCLICK|AUCTION|BID"));
 }
 
 
