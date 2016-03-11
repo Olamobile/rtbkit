@@ -81,7 +81,7 @@ setupOutputs(
             createMatchedWinFile);
     strategyOutput->logTo(
             "",
-            logDir + "/%F/$(10)/$(11)/$(0)-%T.log",
+            logDir + "/%F/$(9)/$(10)/$(0)-%T.log",
             createMatchedWinFile);
 
     logger.addOutput(

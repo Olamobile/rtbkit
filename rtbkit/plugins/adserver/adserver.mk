@@ -11,7 +11,6 @@ $(eval $(call library,adserver_connector, \
 	$(LIBADSERVERCONNECTOR_SOURCES),  \
 	$(LIBADSERVERCONNECTOR_LINK)))
 
-#$(eval $(call library,ola_adserver,ola_adserver_connector.cc ola_win_source.cc ola_event_source.cc,adserver_connector bid_test_utils))
 $(eval $(call library,mock_adserver,mock_adserver_connector.cc mock_win_source.cc mock_event_source.cc,adserver_connector bid_test_utils))
 $(eval $(call library,standard_adserver,standard_adserver_connector.cc standard_win_source.cc standard_event_source.cc,adserver_connector bid_test_utils))
 $(eval $(call program,adserver_runner,adserver_connector boost_program_options services))

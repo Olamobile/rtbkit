@@ -2,5 +2,5 @@
 {
     "type": "standard",
     "winPort": 12340,
-    "eventPort": 12341
+    "eventsPort": 12341
 }

@@ -121,6 +121,8 @@ filter(const BidRequest& br, const ExchangeConnector* conn, const ConfigSet& mas
 {
     GcLockBase::SharedGuard guard(gc, GcLockBase::RD_NO);
 
+    //cout << "Filter br: " << br.auctionId << endl;
+
     const Data* current = data.load();
     ExcCheck(!current->filters.empty(), "No filters registered");
 
@@ -133,6 +135,7 @@ filter(const BidRequest& br, const ExchangeConnector* conn, const ConfigSet& mas
     uint64_t ticksStart = sampleStats ? ticks() : 0;
 
     for (FilterBase* filter : current->filters) {
+
         filter->filter(state);
 
         const ConfigSet& filtered = state.configs();
@@ -155,6 +158,7 @@ filter(const BidRequest& br, const ExchangeConnector* conn, const ConfigSet& mas
     }
 
     auto biddableSpots = state.biddableSpots();
+
     configs = state.configs();
 
     ConfigList result;

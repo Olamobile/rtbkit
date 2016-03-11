@@ -255,7 +255,7 @@ handleWinRq(const HttpHeader & header,
       winPriceDbl = json["price"].asDouble();
       //std::cerr <<"winPriceDbl: " << winPriceDbl;
       winPriceDbl = round(winPriceDbl*1000.0) / 1000.0;
-      cerr.precision(std::numeric_limits<double>::max_digits10);
+      //cerr.precision(std::numeric_limits<double>::max_digits10);
       winPrice = USD_CPM(winPriceDbl);
       //std::cerr <<", winPriceDbl (rounded): " << winPriceDbl;
       //std::cerr <<", winPrice: " << winPrice << std::endl;
@@ -321,6 +321,8 @@ handleDeliveryRq(const HttpHeader & header,
     Id bidRequestId, impId, userId;
     UserIds userIds;
     Date timestamp;
+
+    //std::cerr << "Handle event: " << json << std::endl;
     
     /*
      *  Timestamp is an required field.

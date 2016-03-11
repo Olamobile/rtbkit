@@ -25,7 +25,7 @@
     // Location of the Carbon instances which will be used to log various
     // metrics. If missing, then a barebone internal event logger will be
     // created which can be useful to write tests.
-    // "carbon-uri": ["carbon1.kittens.org:2003", "carbonA.kittens.org:2003"],
+    "carbon-uri": ["127.0.0.1:2003"],
 
     // Port ranges that various services can use to listen for incoming
     // connections. These can be specified either as a single port or a range of

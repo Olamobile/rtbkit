@@ -96,7 +96,7 @@ struct OlaBiddingAgent :
         // Accounts are used to control the allocation of spending budgets for
         // an agent. The whole mechanism is fully generic and can be setup in
         // whatever you feel it bests suits you.
-        config.account = {"ola_campaign_1", "fixed"};
+        config.account = {"ola_campaign_2", "fixed"};
 
 
 	config.providerConfig["smaato"]["seat"] = "356";
@@ -153,7 +153,7 @@ struct OlaBiddingAgent :
 
         // Indicate to the router that we want our bid requests to be augmented
         // with our frequency cap augmentor example.
-	// turn it of for the Smaato compliance test.
+	// turn it off for the Smaato compliance test.
         if (false ){
             AugmentationConfig augConfig;
 

@@ -134,8 +134,6 @@ parseBidRequest(HttpAuctionHandler & connection,
         }
     }
     
-
-
     return result;
 }
 

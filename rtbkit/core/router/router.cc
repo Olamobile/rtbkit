@@ -1351,7 +1351,7 @@ preprocessAuction(const std::shared_ptr<Auction> & auction)
             = Date::now().plusSeconds(secondsUntilLossAssumed_);
     Date lossTimeout = auction->lossAssumed;
 
-    //cerr << "AUCTION " << auction->id << " " << auction->requestStr << endl;
+    //    cerr << "AUCTION " << auction->id << " " << auction->requestStr << endl;
 
     //cerr << "url = " << auction->request->url << endl;
 
@@ -1396,6 +1396,7 @@ preprocessAuction(const std::shared_ptr<Auction> & auction)
 
     // Do the actual filtering.
     auto biddableConfigs = filters.filter(*auction->request, exchangeConnector);
+
 
     auto checkAgent = [&] (
             const AgentConfig & config,
@@ -1738,8 +1739,8 @@ doStartBidding(const std::shared_ptr<AugmentationInfo> & augInfo)
                                auctionId.toString().c_str());
         }
 
-        //cerr << " auction " << id << " with "
-        //     << auctionInfo.bidders.size() << " bidders" << endl;
+	//cerr << " auction " << auctionId.toString().c_str() << " with "
+	//       << auctionInfo.bidders.size() << " bidders" << endl;
 
         //auctionInfo.activities.push_back(ML::format("total of %zd agents",
         //                                 auctionInfo.bidders.size()));
