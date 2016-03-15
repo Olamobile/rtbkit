@@ -194,6 +194,8 @@ handleWinRq(const HttpHeader & header,
     string userIdStr;
     string passback;
 
+    std::cerr << json << std::endl;
+
     /*
      *  Timestamp is an required field.
      *  If null, we return an error response.

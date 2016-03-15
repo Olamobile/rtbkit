@@ -89,7 +89,8 @@
                     "root": ".",
                     "path": "build/x86_64/bin/ola_bidding_agent",
                     "arg": [
-                        "-B", "rtbkit/ola.bootstrap.json"
+                        "-B", "rtbkit/ola.bootstrap.json",
+			"-N", "OLA_bidder"
                     ],
                     "log": true
                 }
