@@ -1,6 +1,0 @@
-/* -*- js-mode -*- */
-{
-    "type": "standard",
-    "winPort": 12340,
-    "eventsPort": 12341
-}

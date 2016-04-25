@@ -5,11 +5,7 @@ LIBADSERVERCONNECTOR_SOURCES := \
 	http_adserver_connector.cc
 
 LIBADSERVERCONNECTOR_LINK := \
-<<<<<<< HEAD
 	zeromq boost_thread utils endpoint services rtb gc
-=======
-	zeromq boost_thread utils endpoint services rtb gc #rdkafka++ rdkafka
->>>>>>> 7ef81a25cb2be65ef837a9a3ddc09f91a3fa934a
 
 $(eval $(call library,adserver_connector, \
 	$(LIBADSERVERCONNECTOR_SOURCES),  \
