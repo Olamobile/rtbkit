@@ -432,7 +432,7 @@ doCampaignEvent(std::shared_ptr<PostAuctionEvent> event)
         // implement what is written above
         recordHit("delivery.%s.stillInFlight", label);
         doError("doCampaignEvent.auctionNotWon" + label,
-                "message for auction that's not won");
+                "message for auction id: " + to_string(auctionId) + " that's not won");
 
         recordUnmatched("inFlight");
 

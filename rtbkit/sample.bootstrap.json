@@ -19,7 +19,7 @@
     // discovery. If missing, then all will need to be located in the same
     // process and share a single instance of the ServiceProxies object (useful
     // for tests).
-    "zookeeper-uri": "localhost:2181",
+    "zookeeper-uri": "kazoo001.olause.prv:2181",
 
     // Location of the Carbon instances which will be used to log various
     // metrics. If missing, then a barebone internal event logger will be

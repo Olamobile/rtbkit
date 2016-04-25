@@ -123,6 +123,13 @@ parseBidRequest(HttpAuctionHandler & connection,
         throw;
     }
 
+    // load blocked categories as restrictions
+    std::vector<std::string> strv;
+    for (const auto& cat: result->blockedCategories)
+        strv.push_back(cat.val);
+    result->restrictions.addStrings("blockedCategories", strv);
+
+
     // Check if we want some reporting
     auto verbose = header.headers.find("x-openrtb-verbose");
     if(header.headers.end() != verbose) {
@@ -133,6 +140,9 @@ parseBidRequest(HttpAuctionHandler & connection,
             }
         }
     }
+
+    // debug
+    //cerr << result->toJson() << endl;
     
     return result;
 }
@@ -215,6 +225,7 @@ ExchangeConnector::ExchangeCompatibility
     getAttr(result, pconf, "adid", crinfo->adid, includeReasons);
     getAttr(result, pconf, "adomain", crinfo->adomain, includeReasons);
     getAttr(result, pconf, "mimeTypes", crinfo->mimeTypes, includeReasons);
+    getAttr(result, pconf, "cat", crinfo->cat, includeReasons);
     result.info = crinfo;
  
     return result;
@@ -227,19 +238,29 @@ ExchangeConnector::ExchangeCompatibility
             const void * info) const {
       const auto crinfo = reinterpret_cast<const CreativeInfo*>(info);
 
-      // now go through the spots.
-      for (const auto& spot: request.imp) {
-          //const auto& mime_types = spot.banner->mimes;
-	for (const auto& mimeType : spot.banner->mimes) { 
-              if (std::find(crinfo->mimeTypes.begin(), crinfo->mimeTypes.end(), mimeType.type)
-                      != crinfo->mimeTypes.end()) {
-                  this->recordHit ("blockedMime");
-                  return true;
-              }
-	}
+    // 1) we first check for blocked content categories
+    const auto& blocked_categories = request.restrictions.get("blockedCategories");
+    for (const auto& cat: crinfo->cat)
+      if (blocked_categories.contains(cat)) {
+	this->recordHit ("blockedCategory");
+	return false;
       }
-
-       return false;
+    
+    // 2) now go through the spots.
+    // this has to be last!
+    for (const auto& spot: request.imp) {
+      if (spot.banner != nullptr) {
+	for (const auto& mimeType : spot.banner->mimes) { 
+	  if (std::find(crinfo->mimeTypes.begin(), 
+			crinfo->mimeTypes.end(), mimeType.type)
+	      != crinfo->mimeTypes.end()) {
+	    return true;
+	  } // if
+	} // for (const 
+      } // if (spot.banner
+    } // for (const
+    this->recordHit ("blockedMime");
+    return false;
   }
 
 void

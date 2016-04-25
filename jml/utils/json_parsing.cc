@@ -34,6 +34,19 @@ void skipJsonWhitespace(Parse_Context & context)
            && (context.match_whitespace() || context.match_eol()));
 }
 
+  // as a side effect, changes Ü to U and ü to u
+  void extractAscii(char & c) {
+    if (c == 0xdc /* 'Ü' */)
+      c = 'U';
+    if (c == 0xfc /* 'ü' */)
+      c = 'u';
+
+    if (c < ' ' || c >= 127) {
+      c =  '?';
+    }
+
+  }
+
 char * jsonEscapeCore(const std::string & str, char * p, char * end)
 {
     for (unsigned i = 0;  i < str.size();  ++i) {
@@ -41,7 +54,8 @@ char * jsonEscapeCore(const std::string & str, char * p, char * end)
             return 0;
 
         char c = str[i];
-        if (c >= ' ' && c < 127 && c != '\"' && c != '\\')
+	extractAscii(c);
+	if (c >= ' ' && c < 127 && c != '\"' && c != '\\') // original
             *p++ = c;
         else {
             *p++ = '\\';

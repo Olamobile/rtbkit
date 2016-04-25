@@ -795,7 +795,7 @@ void
 Router::
 injectAuction(std::shared_ptr<Auction> auction, double lossTime)
 {
-    // cerr << "injectAuction was called!!!" << endl;
+  //cerr << "injectAuction was called!!!" << endl;
     if (!auction->handleAuction) {
         // Modify the auction to insert our auction done handling
         auction->handleAuction
@@ -1351,8 +1351,7 @@ preprocessAuction(const std::shared_ptr<Auction> & auction)
             = Date::now().plusSeconds(secondsUntilLossAssumed_);
     Date lossTimeout = auction->lossAssumed;
 
-    //    cerr << "AUCTION " << auction->id << " " << auction->requestStr << endl;
-
+    //cerr << "AUCTION " << auction->id << " " << auction->requestStr << endl;
     //cerr << "url = " << auction->request->url << endl;
 
     if (auction->tooLate()) {
@@ -1424,6 +1423,8 @@ preprocessAuction(const std::shared_ptr<Auction> & auction)
 
             return true;
         };
+
+    //cerr << "Num biddage Configs: " << biddableConfigs.size() << endl;
 
     for (const auto& entry : biddableConfigs) {
         if (entry.biddableSpots.empty()) continue;
@@ -1740,7 +1741,7 @@ doStartBidding(const std::shared_ptr<AugmentationInfo> & augInfo)
         }
 
 	//cerr << " auction " << auctionId.toString().c_str() << " with "
-	//       << auctionInfo.bidders.size() << " bidders" << endl;
+	//     << auctionInfo.bidders.size() << " bidders" << endl;
 
         //auctionInfo.activities.push_back(ML::format("total of %zd agents",
         //                                 auctionInfo.bidders.size()));
