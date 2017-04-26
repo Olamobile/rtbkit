@@ -8,6 +8,7 @@
 */
 
 #include "parse_context.h"
+#include "json_parsing.h"
 #include "stdarg.h"
 #include "file_functions.h"
 #include "string_functions.h"
@@ -400,6 +401,48 @@ expect_double(double min, double max, const char * error)
 {
     double val;
     if (!match_double(val, min, max))
+        exception(error);
+    return val;
+}
+
+  // the below fuctions will try to parse a double precision value as string or double
+bool
+Parse_Context::
+match_double_or_string(double & val, double min, double max)
+{
+    Revert_Token t(*this);
+    Parse_Context & c = *this;
+
+    if (!ML::match_float(val, *this)) {
+      // now try to interpret the value as a string encoded double
+      if (*c == '"') {
+	std::string floatString = ML::expectJsonString(c);
+	try {
+	  val = std::stod(floatString);
+	}
+	catch (std::invalid_argument & e) {
+	  return false;
+	}
+	catch (std::out_of_range & e) {
+	  return false;
+	}
+      } else {
+	return false;
+      }
+    }
+
+
+    if (val < min || val > max) return false;
+    t.ignore();
+    return true;
+}
+
+double
+Parse_Context::
+expect_double_or_string(double min, double max, const char * error)
+{
+    double val;
+    if (!match_double_or_string(val, min, max))
         exception(error);
     return val;
 }

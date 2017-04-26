@@ -18,6 +18,8 @@ namespace RTBKIT {
     Logging::Category OpenRTBBidRequestLogs::error("[ERROR] OpenRTB Bid Request Parser error", OpenRTBBidRequestLogs::trace);
     Logging::Category OpenRTBBidRequestLogs::trace22("OpenRTB Bid Request 2.2 Parser ");
     Logging::Category OpenRTBBidRequestLogs::error22("[ERROR] OpenRTB Bid Request Parser 2.2 error", OpenRTBBidRequestLogs::trace22);
+    Logging::Category OpenRTBBidRequestLogs::trace24("OpenRTB Bid Request 2.4 Parser ");
+    Logging::Category OpenRTBBidRequestLogs::error24("[ERROR] OpenRTB Bid Request Parser 2.4 error", OpenRTBBidRequestLogs::trace24);
 
     static DefaultDescription<OpenRTB::BidRequest> desc;
 
@@ -30,8 +32,10 @@ openRTBBidRequestParserFactory(const std::string & version)
 
     if(version == "2.0" || version == "2.1") {
         return std::unique_ptr<OpenRTBBidRequestParser2point1>(new OpenRTBBidRequestParser2point1());
-    } else if(version == "2.2") {
+    } else if(version == "2.2" ) {
         return std::unique_ptr<OpenRTBBidRequestParser2point2>(new OpenRTBBidRequestParser2point2());
+    } else if(version == "2.3" || version == "2.4") {
+        return std::unique_ptr<OpenRTBBidRequestParser2point4>(new OpenRTBBidRequestParser2point4());
     }
 
     THROW(OpenRTBBidRequestLogs::error) << "Version : " << version << " not supported in RTBkit." << endl;
@@ -743,6 +747,114 @@ OpenRTBBidRequestParser2point2::
 onPMP(OpenRTB::PMP & pmp) {
 }
 
+
+
+  ///////////////// OpenRTB 2.4 //////////////////////////////////////////////
+
+void
+OpenRTBBidRequestParser2point4::
+onBidRequest(OpenRTB::BidRequest & br) {
+
+    // Call V1
+    OpenRTBBidRequestParser::onBidRequest(br);
+
+    if(ctx.br->regs)
+        this->onRegulations(*br.regs);
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onImpression(OpenRTB::Impression & imp) {
+
+    // Deal with secure, business logic
+    
+    // Deal with PMP
+    if(imp.pmp) {
+        this->onPMP(*imp.pmp);
+    }
+
+    // Call V1
+    OpenRTBBidRequestParser::onImpression(imp);
+    
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onBanner(OpenRTB::Banner & banner) {
+
+    // Business logic around w/h min/max
+    
+    // Call V1
+    OpenRTBBidRequestParser::onBanner(banner);
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onVideo(OpenRTB::Video & video) {
+
+    if(video.mimes.empty()) {
+        THROW(OpenRTBBidRequestLogs::error24) << "br.imp.video.mimes needs to be populated." << endl;
+    }
+
+    // -1 being the default value
+    if(video.protocol.value() != -1 && (video.protocol.value() < 0 || video.protocol.value() > 6)) {
+        LOG(OpenRTBBidRequestLogs::error24) << video.protocol.value() << endl;
+        THROW(OpenRTBBidRequestLogs::error24) << "br.imp.video.protocol if specified must match a value in OpenRTB 2.4 Table 6.7." << endl;
+    }
+
+    if(video.minduration.val < 0 ) {
+        THROW(OpenRTBBidRequestLogs::error24) << "br.imp.video.minduration must be specified and positive." << endl;
+    }
+
+    if(video.maxduration.val < 0 ) {
+        THROW(OpenRTBBidRequestLogs::error24) << "br.imp.video.maxduration must be specified and positive." << endl;
+    } else if (video.maxduration.val < video.minduration.val) {
+        // Illogical
+        THROW(OpenRTBBidRequestLogs::error24) << "br.imp.video.maxduration can't be smaller than br.imp.video.minduration." << endl;
+    } 
+
+    ctx.spot.position = video.pos;
+
+    // Add api to the segments in order to filter on it
+    for(auto & api : video.api) {
+        auto framework = apiFrameworks.find(api.val);
+        if (framework != apiFrameworks.end())
+            ctx.br->segments.add("api-video", framework->second, 1.0);
+    }
+    ctx.spot.formats.push_back(Format(video.w.value(), video.h.value()));
+
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onDevice(OpenRTB::Device & device) {
+
+    if(device.devicetype.val > 7)
+        LOG(OpenRTBBidRequestLogs::error22) << "Device Type : " << device.devicetype.val << " not supported in OpenRTB 2.4." << endl;
+
+    // Call base version
+    OpenRTBBidRequestParser::onDevice(device);
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onRegulations(OpenRTB::Regulations & regs) {
+
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onDeal(OpenRTB::Deal & deal) {
+
+}
+
+void
+OpenRTBBidRequestParser2point4::
+onPMP(OpenRTB::PMP & pmp) {
+}
+
+
+  /////////////////////////////////////////////////////////////////////////
 namespace {
 
 struct AtInit {

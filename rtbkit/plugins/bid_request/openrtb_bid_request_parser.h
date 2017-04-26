@@ -20,6 +20,8 @@ struct OpenRTBBidRequestLogs {
     static Logging::Category error;
     static Logging::Category trace22;
     static Logging::Category error22;
+    static Logging::Category trace24;
+    static Logging::Category error24;
 };
 
 /*****************************************************************************/
@@ -98,6 +100,28 @@ struct OpenRTBBidRequestParser2point1 : OpenRTBBidRequestParser {
 struct OpenRTBBidRequestParser2point2 : OpenRTBBidRequestParser {
 
     OpenRTBBidRequestParser2point2() {
+        apiFrameworks = { {1, "VPAID 1.0"},
+                          {2, "VPAID 2.0"},
+                          {3, "MRAID-1"},
+                          {4, "ORMMA"},
+                          {5, "MRAID-2"}
+        };
+    };
+
+    private :
+        virtual void onBidRequest(OpenRTB::BidRequest & br);
+        virtual void onImpression(OpenRTB::Impression & imp);
+        virtual void onBanner(OpenRTB::Banner & banner);
+        virtual void onVideo(OpenRTB::Video & video);
+        virtual void onDevice(OpenRTB::Device & device);
+        virtual void onRegulations(OpenRTB::Regulations & regs);
+        virtual void onPMP(OpenRTB::PMP & pmp);
+        virtual void onDeal(OpenRTB::Deal & deal);
+};
+
+struct OpenRTBBidRequestParser2point4 : OpenRTBBidRequestParser {
+
+    OpenRTBBidRequestParser2point4() {
         apiFrameworks = { {1, "VPAID 1.0"},
                           {2, "VPAID 2.0"},
                           {3, "MRAID-1"},

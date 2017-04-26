@@ -205,6 +205,7 @@ struct JsonParsingContext {
 
     virtual float expectFloat() = 0;
     virtual double expectDouble() = 0;
+    virtual double expectDoubleOrString() = 0;
     virtual bool expectBool() = 0;
     virtual bool matchUnsignedLongLong(unsigned long long & val) = 0;
     virtual bool matchLongLong(long long & val) = 0;
@@ -384,6 +385,11 @@ struct StreamingJsonParsingContext
     virtual double expectDouble()
     {
         return context->expect_double();
+    }
+
+    virtual double expectDoubleOrString()
+    {
+        return context->expect_double_or_string();
     }
 
     virtual bool expectBool()
@@ -584,6 +590,11 @@ struct StructuredJsonParsingContext: public JsonParsingContext {
     }
 
     virtual double expectDouble()
+    {
+        return current->asDouble();
+    }
+
+    virtual double expectDoubleOrString()
     {
         return current->asDouble();
     }

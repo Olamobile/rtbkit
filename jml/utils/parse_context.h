@@ -340,6 +340,14 @@ struct Parse_Context {
     double expect_double(double min = -INFINITY, double max = INFINITY,
                          const char * error = "expected double");
     
+    /** Matches a floating point value in the given range. 
+	Will interpret a string as double if needed */
+    bool match_double_or_string(double & val,
+                      double min = -INFINITY, double max = INFINITY);
+    
+    double expect_double_or_string(double min = -INFINITY, double max = INFINITY,
+                         const char * error = "expected double");
+    
     bool match_whitespace()
     {
         bool result = false;

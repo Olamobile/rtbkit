@@ -11,6 +11,7 @@
 #include "value_description.h"
 #include "soa/types/url.h"
 #include "soa/types/date.h"
+//#include "soa/types/json_parsing.h"
 #include "jml/utils/compact_vector.h"
 
 namespace Datacratic {
@@ -905,6 +906,15 @@ struct TaggedDouble {
     double val;
 };
 
+struct TaggedDoubleOrString {
+    TaggedDoubleOrString(double v = std::numeric_limits<double>::quiet_NaN())
+        : val(v)
+    {
+    }
+
+    double val;
+};
+
 template<int num = -1, int den = 1>
 struct TaggedDoubleDef : public TaggedDouble {
     TaggedDoubleDef(double v = 1.0 * num / den)
@@ -1141,6 +1151,29 @@ struct DefaultDescription<TaggedDouble>
     }
 
     virtual bool isDefaultTyped(const TaggedDouble * val) const
+    {
+        return std::isnan(val->val);
+    }
+};
+
+template<>
+struct DefaultDescription<TaggedDoubleOrString>
+    : public ValueDescriptionI<TaggedDoubleOrString,
+                               ValueKind::FLOAT> {
+
+    virtual void parseJsonTyped(TaggedDoubleOrString * val,
+                                JsonParsingContext & context) const
+    {
+        val->val = context.expectDoubleOrString();
+    }
+
+    virtual void printJsonTyped(const TaggedDoubleOrString * val,
+                                JsonPrintingContext & context) const
+    {
+        context.writeDouble(val->val);
+    }
+
+    virtual bool isDefaultTyped(const TaggedDoubleOrString * val) const
     {
         return std::isnan(val->val);
     }
