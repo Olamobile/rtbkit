@@ -41,7 +41,7 @@ struct OpenRtbBidRequestParser {
     parseBidRequest(const std::string & jsonValue,
                     const std::string & provider,
                     const std::string & exchange = "",
-                    const std::string & version = "2.1");
+                    const std::string & version = "2.2");
 
     static OpenRTB::BidRequest
     parseBidRequest(ML::Parse_Context & context);
@@ -50,7 +50,7 @@ struct OpenRtbBidRequestParser {
     parseBidRequest(ML::Parse_Context & context,
                     const std::string & provider,
                     const std::string & exchange = "",
-                    const std::string & version = "2.1");
+                    const std::string & version = "2.2");
         
 };
 } // namespace RTBKIT
