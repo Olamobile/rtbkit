@@ -830,7 +830,7 @@ OpenRTBBidRequestParser2point4::
 onDevice(OpenRTB::Device & device) {
 
     if(device.devicetype.val > 7)
-        LOG(OpenRTBBidRequestLogs::error22) << "Device Type : " << device.devicetype.val << " not supported in OpenRTB 2.4." << endl;
+        LOG(OpenRTBBidRequestLogs::error24) << "Device Type : " << device.devicetype.val << " not supported in OpenRTB 2.4." << endl;
 
     // Call base version
     OpenRTBBidRequestParser::onDevice(device);
