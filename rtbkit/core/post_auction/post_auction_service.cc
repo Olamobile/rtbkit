@@ -545,9 +545,11 @@ doMatchedWinLoss(std::shared_ptr<MatchedWinLoss> event)
     if (event->type == MatchedWinLoss::Win || event->type == MatchedWinLoss::LateWin) {
         lastWinLoss = Date::now();
         stats.matchedWins++;
-    } else {
+    } else if (event->type == MatchedWinLoss::Loss) {
         stats.matchedLosses++;
-        return;
+	//   return;
+    } else {
+      return;
     }
 
     if (analytics) event->publish(*analytics);
