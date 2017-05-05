@@ -34,13 +34,13 @@ struct ExchangeConnector;
 
 /** Describes a creative that an agent has available.
 
-    A creative is a general-purpose entity that can represent either an image
-    or a video
+    A creative is a general-purpose entity that can represent either an image,
+    a video, or an interstitial (popunder)
  */
 
 struct Creative {
 
-    enum class Type { Image, Video };
+  enum class Type { Image, Video, Popunder };
 
     Creative(int width = 0, int height = 0, std::string name = "", int id = -1,
             const std::string dealId = "");
@@ -132,9 +132,14 @@ struct Creative {
     /** Is this  a video creative ? */
     bool isVideo() const;
 
+    /** Is this  a popunder creative ? */
+    bool isPopunder() const;
+
     static Creative image(int width, int height, std::string name = "", int id = -1, std::string dealId = "");
     static Creative video(int width, int height, uint32_t duration, uint64_t bitrate,
                 std::string name = "", int id = -1, std::string dealId = "");
+
+    static Creative popunder(std::string name = "", int id = -1, std::string dealId = "");
 
     ExtensionPool extensions;
 
