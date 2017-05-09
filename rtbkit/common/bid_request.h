@@ -36,7 +36,9 @@ typedef ML::compact_vector<uint32_t, 3, uint32_t> IntVector;
 /* FORMAT                                                                    */
 /*****************************************************************************/
 
-/** Tiny structure describing the format of an ad. */
+/** Tiny structure describing the format of an ad. 
+ *  A construction with width = -2 and height = -2 represents a popunder format
+ */
 
 struct Format {
     Format(int16_t width = -1, int16_t height = -1)
@@ -46,7 +48,7 @@ struct Format {
 
     bool valid() const
     {
-        return width > 0 && height > 0;
+      return (width > 0 && height > 0) || (width == -2 && height == -2) ;
     }
 
     Json::Value getWidthsJson() const;
