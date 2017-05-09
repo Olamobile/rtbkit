@@ -15,12 +15,13 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <mutex>
+#include <iostream>
 
 namespace RTBKIT {
 
 
 /******************************************************************************/
-/* CREATIVE FORTMAT FILTER                                                    */
+/* CREATIVE FORMAT FILTER                                                    */
 /******************************************************************************/
 
 struct CreativeFormatFilter : public CreativeFilter<CreativeFormatFilter>
@@ -31,8 +32,15 @@ struct CreativeFormatFilter : public CreativeFilter<CreativeFormatFilter>
     void addCreative(
             unsigned cfgIndex, unsigned crIndex, const Creative& creative)
     {
-        auto formatKey = makeKey(creative.format);
-        formatFilter[formatKey].set(crIndex, cfgIndex);
+      Format f { creative.format };
+
+      if (creative.isPopunder()) {
+	//std::cout << "we have a popunder creative..." << std::endl;
+	f = Format(-2, -2); // representing a popunder as format	
+      }
+
+      auto formatKey = makeKey(f);
+      formatFilter[formatKey].set(crIndex, cfgIndex);
     }
 
     void removeCreative(
@@ -45,16 +53,28 @@ struct CreativeFormatFilter : public CreativeFilter<CreativeFormatFilter>
     void filterImpression(
             FilterState& state, unsigned impIndex, const AdSpot& imp) const
     {
+
         if(!(imp.formats.empty()))
         {
-            // The 0x0 format means: match anything.
-            CreativeMatrix creatives = get(Format(0,0));
+	  // The 0x0 format means: match anything.
+	  CreativeMatrix creatives = get(Format(0,0));
+	  
+	  for (const auto& format : imp.formats) {
+	    creatives |= get(format);
+	  }
+	  
+	  state.narrowCreativesForImp(impIndex, creatives);
+        } else if (imp.instl.val) {
+	  // we might still have compatible creatives if there are 
+	  // popunder creatives and the impression object is interstitial
 
-            for (const auto& format : imp.formats)
-                creatives |= get(format);
+	  CreativeMatrix creatives = get(Format(-2,-2)); // find popunders
 
-            state.narrowCreativesForImp(impIndex, creatives);
-        }
+	  //std::cout << "These are the popunders: " << creatives.print() << std::endl;
+	  
+	  state.narrowCreativesForImp(impIndex, creatives);
+	  
+	}
     }
 
 
@@ -66,7 +86,10 @@ private:
 
     FormatKey makeKey(const Format& format) const
     {
-        return uint32_t(format.width << 16 | format.height);
+      if (format.width == -2 && format.height == -2) {
+	return 0xfffefffe;
+      }
+      return uint32_t(format.width << 16 | format.height);
     }
 
     CreativeMatrix get(const Format& format) const
