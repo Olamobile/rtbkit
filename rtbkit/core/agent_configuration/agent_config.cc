@@ -64,6 +64,15 @@ video(int width, int height, uint32_t duration, uint64_t bitrate, std::string na
     return creative;
 }
 
+Creative
+Creative::
+popunder(std::string name, int id, std::string dealId)
+{
+    Creative creative(-2, -2, name, id, dealId);
+    creative.type = Creative::Type::Popunder;
+    return creative;
+}
+
 void
 Creative::
 fromJson(const Json::Value & val)
@@ -110,6 +119,8 @@ fromJson(const Json::Value & val)
                 type = Type::Video;
             else if (type_ == "image")
                 type = Type::Image;
+            else if (type_ == "popunder")
+                type = Type::Popunder;
             else
                 throw ML::Exception("Unknown type '%s'", type_.c_str());
         }
@@ -185,9 +196,21 @@ bool
 Creative::
 compatible(const AdSpot & adspot) const
 {
+#if 0
+  if (isPopunder()) {
+    // if creative is popunder, we are compatible if adspot is interstitial
+    return (adspot.instl.val);
+  } else {
     return ((format.width == 0 && format.height == 0)
             || adspot.formats.empty() // if no format was specified in bid request
             || adspot.formats.compatible(format));
+  }
+#endif
+
+    return ((format.width == 0 && format.height == 0)
+            || adspot.formats.empty() // if no format was specified in bid request
+            || adspot.formats.compatible(format));
+
 }
 
 bool
@@ -210,6 +233,12 @@ isVideo() const {
     return type == Type::Video;
 }
 
+bool
+Creative::
+isPopunder() const {
+    return type == Type::Popunder;
+}
+
 std::string
 Creative::
 typeString() const {
@@ -218,6 +247,8 @@ typeString() const {
         return "image";
     case Type::Video:
         return "video";
+    case Type::Popunder:
+        return "popunder";
     }
 
     return "unknown";
