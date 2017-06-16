@@ -213,7 +213,8 @@ fromOpenRtb(OpenRTB::BidRequest && req,
 
         // Adding IAB categories to segments
         for(auto& v : result->site->cat) {
-            result->segments.add("iab-categories", v.val);
+            result->segments.add("iab-categories", v);
+	    //            result->segments.add("iab-categories", v.val);
         }
     }
     else if (req.app) {
@@ -226,7 +227,8 @@ fromOpenRtb(OpenRTB::BidRequest && req,
         
         // Adding IAB categories to segments
         for(auto& v : result->app->cat) {
-            result->segments.add("iab-categories", v.val);
+            result->segments.add("iab-categories", v);
+	    //            result->segments.add("iab-categories", v.val);
         }
     }
 

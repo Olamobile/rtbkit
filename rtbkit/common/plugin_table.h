@@ -112,6 +112,9 @@ PluginTable<T>::getPlugin(const std::string& name, const std::string& libSuffix)
         libPath = "lib" + name + "_" + libSuffix + ".so";
     }
 
+    std::cout << "plugName: " << plugName << std::endl;
+    std::cout << "libPath: " << libPath << std::endl;
+
     // check if it already exists
     {
         std::lock_guard<std::mutex> guard(mu);

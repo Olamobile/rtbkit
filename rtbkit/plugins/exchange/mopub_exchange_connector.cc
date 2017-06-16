@@ -238,8 +238,10 @@ parseBidRequest(HttpAuctionHandler & connection,
     // get restrictions enforced by MoPub.
     //1) blocked category
     std::vector<std::string> strv;
-    for (const auto& cat: res->blockedCategories)
-        strv.push_back(cat.val);
+    for (const auto& cat: res->blockedCategories){
+        strv.push_back(cat);
+        //strv.push_back(cat.val);
+    }
     res->restrictions.addStrings("blockedCategories", strv);
 
     //2) per slot: blocked type and attribute;
