@@ -846,6 +846,7 @@ struct TaggedInt {
     int val;
 };
 
+
 template<int defValue = -1>
 struct TaggedIntDef : TaggedInt {
     TaggedIntDef(int v = defValue)
@@ -1051,6 +1052,8 @@ struct DefaultDescription<TaggedInt64>
     }
 };
 
+
+
 template<int64_t defValue>
 struct DefaultDescription<TaggedInt64Def<defValue> >
   : public ValueDescriptionI<TaggedInt64Def<defValue>, ValueKind::INTEGER > {
@@ -1131,6 +1134,10 @@ struct DefaultDescription<TaggedDouble>
     virtual void parseJsonTyped(TaggedDouble * val,
                                 JsonParsingContext & context) const
     {
+      if (context.isString()){
+	std::string s = context.expectStringAscii();
+	val->val = boost::lexical_cast<double>(s);
+      } else
         val->val = context.expectDouble();
     }
 
@@ -1302,6 +1309,7 @@ struct List: public ML::compact_vector<T, 3> {
 /// This can either be:
 /// single format: "w": 123
 /// multiple formats: "w": [ 123, 456 ]
+/// also allow for elements to be strings
 struct FormatListDescription
     : public ValueDescriptionI<List<int> >,
       public ListDescriptionBase<int> {
@@ -1312,12 +1320,22 @@ struct FormatListDescription
         if (context.isArray()) {
             auto onElement = [&] ()
                 {
+		  if (context.isString()) {
+		    std::string s = context.expectStringAscii();
+		    val->push_back(boost::lexical_cast<int>(s));
+		  } else {		  
                     val->push_back(context.expectInt());
+		  }
                 };
             context.forEachElement(onElement);
         }
         else {
-            val->push_back(context.expectInt());
+	  if (context.isString()) {
+	    std::string s = context.expectStringAscii();
+	    val->push_back(boost::lexical_cast<int>(s));
+	  } else {		  
+	    val->push_back(context.expectInt());
+	  }
         }
     }
 
@@ -1332,6 +1350,45 @@ struct FormatListDescription
     }
 
     virtual bool isDefaultTyped(const List<int> * val) const
+    {
+        return val->empty();
+    }
+
+};
+
+/// This can either be:
+/// single category: "cat": "IAB19-3"
+/// multiple categories: "cat": [ "IAB19-3", "IAB1-5" ]
+struct FormatCatDescription
+  : public ValueDescriptionI<List<std::string> >,
+    public ListDescriptionBase<std::string> {
+
+  virtual void parseJsonTyped(List<std::string> * val,
+                                JsonParsingContext & context) const
+    {
+        if (context.isArray()) {
+            auto onElement = [&] ()
+                {
+                    val->push_back(context.expectStringAscii());
+                };
+            context.forEachElement(onElement);
+        }
+        else {
+            val->push_back(context.expectStringAscii());
+        }
+    }
+
+  virtual void printJsonTyped(const List<std::string> * val,
+                                JsonPrintingContext & context) const
+    {
+      //        if (val->size() == 1) {
+      //      this->inner->printJsonTyped(&(*val)[0], context);
+      //  }
+      //  else
+            printJsonTypedList(val, context);
+    }
+
+  virtual bool isDefaultTyped(const List<std::string> * val) const
     {
         return val->empty();
     }

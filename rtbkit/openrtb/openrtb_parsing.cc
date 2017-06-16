@@ -196,7 +196,8 @@ DefaultDescription()
             new StringIdDescription());
     addField("name", &Context::name, "Site or app name");
     addField("domain", &Context::domain, "Site or app domain");
-    addField("cat", &Context::cat, "IAB content categories for the site/app");
+    addField("cat", &Context::cat, "IAB content categories for the site/app", 
+	                  new FormatCatDescription());
     addField("sectioncat", &Context::sectioncat, "IAB content categories for site/app section");
     addField("pagecat", &Context::pagecat, "IAB content categories for site/app page");
     addField("privacypolicy", &Context::privacypolicy, "Site or app has a privacy policy");

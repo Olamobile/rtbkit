@@ -15,6 +15,9 @@
 
 namespace Datacratic {
 
+
+
+#if 0
 template<>
 struct DefaultDescription<OpenRTB::ContentCategory>
     : public ValueDescriptionI<OpenRTB::ContentCategory> {
@@ -35,7 +38,7 @@ struct DefaultDescription<OpenRTB::ContentCategory>
         context.writeString(val->val);
     }
 };
-
+#endif
 template<>
 struct DefaultDescription<OpenRTB::MimeType>
     : public ValueDescriptionI<OpenRTB::MimeType, ValueKind::STRING> {

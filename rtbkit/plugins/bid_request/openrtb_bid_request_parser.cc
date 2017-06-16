@@ -265,8 +265,10 @@ onBidRequest(OpenRTB::BidRequest & br) {
 
     // Blocked cats if any, put into restriction segment
     std::vector<string> bcats;
-    for(auto b : br.bcat)
-        bcats.push_back(b.val);
+    for(auto b : br.bcat) {
+        bcats.push_back(b);
+        //bcats.push_back(b.val);
+    }
 
     ctx.br->restrictions.addStrings("bcat", bcats);
     ctx.br->blockedCategories = std::move(br.bcat);
@@ -423,17 +425,20 @@ onContext(OpenRTB::Context & context) {
     
     // Adding IAB categories to segments for filtering
     for(auto & v : context.cat) {
-        ctx.br->segments.add("iab-categories", v.val);
+        ctx.br->segments.add("iab-categories", v);
+        //ctx.br->segments.add("iab-categories", v.val);
     }
 
     // Adding sub section IAB categories to segments for filtering
     for(auto & v : context.sectioncat) {
-        ctx.br->segments.add("subsection-iab-categories", v.val);
+        ctx.br->segments.add("subsection-iab-categories", v);
+        //ctx.br->segments.add("subsection-iab-categories", v.val);
     }
 
     // Adding page IAB categories to segments for filtering
     for(auto & v : context.pagecat) {
-        ctx.br->segments.add("page-iab-categories", v.val);
+        ctx.br->segments.add("page-iab-categories", v);
+        //ctx.br->segments.add("page-iab-categories", v.val);
     }
 
     // Publisher object

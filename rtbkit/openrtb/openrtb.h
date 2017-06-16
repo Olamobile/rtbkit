@@ -72,6 +72,7 @@ struct MimeType {
     (This is a huge taxonomy... there are no enumerated values).
 */
 
+#if 0
 struct ContentCategory {
 
     ContentCategory(const std::string & val = "")
@@ -95,6 +96,9 @@ struct ContentCategory {
     int l2;
 #endif
 };
+#endif
+
+  using ContentCategory = std::string;
 
 
 /*****************************************************************************/
@@ -1232,10 +1236,12 @@ struct Geo {
     ~Geo();
     Datacratic::TaggedDouble lat;        ///< Latitude of user (-90 to 90; South negative)
     Datacratic::TaggedDouble lon;        ///< Longtitude (-180 to 180; west is negative)
+
     LocationType type;      ///< Source of Geo data (table 6.15)
     Datacratic::TaggedInt accuracy;
     Datacratic::TaggedInt lastfix;
     Datacratic::TaggedInt ipservice;
+
     std::string country;         ///< Country code (ISO 3166-1 Alpha-3)
     Datacratic::UnicodeString region;          ///< Region code (ISO 3166-2)
     std::string regionfips104;   ///< Region using FIPS 10-4
