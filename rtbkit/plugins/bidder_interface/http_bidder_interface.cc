@@ -101,8 +101,17 @@ HttpBidderInterface::HttpBidderInterface(std::string serviceName,
                    << "\t}" << std::endl << "}";
     }
 
+/*
     // Force http_client_v2 to avoid latency added by curl in v1
     httpClientRouter.reset(new HttpClient(routerHost, routerHttpActiveConnections, 0, 2));
+*/    
+    // Force http_client_v1 because v2 introduces errors that crash the router.
+    // Revert this once the v2 client is fixed.
+    //
+    // For details, see:
+    // https://groups.google.com/a/rtbkit.org/forum/#!topic/discuss/6pj6dHkGPZ8
+    httpClientRouter.reset(new HttpClient(routerHost, routerHttpActiveConnections, 0, 1));
+    
     /* We do not want curl to add an extra "Expect: 100-continue" HTTP header
      * and then pay the cost of an extra HTTP roundtrip. Thus we remove this
      * header
@@ -231,8 +240,23 @@ void HttpBidderInterface::sendAuctionMessage(std::shared_ptr<Auction> const & au
 
                              routerFormat(bid, theBid, agent, config, body, bidders);
 
-                             ExcCheck(!agent.empty(), "Invalid agent");
 
+                             // Replaced this assert with a log and a return to
+                             // avoid exceptions that crash the router.
+                             //
+                             // For details, see:
+                             // https://groups.google.com/a/rtbkit.org/forum/m/#!topic/discuss/TzKLU3ywZfA
+                             //
+                             // ExcCheck(!agent.empty(), "Invalid agent");
+                             if (agent.empty()) {
+                                 LOG(error) << "Invalid agent" << std::endl;
+                                 recordError("unknown");
+                                 return;
+                             }
+                             
+                             //ExcCheck(!agent.empty(), "Invalid agent");
+                             
+                             
                              if (!bid.crid) {
                                  LOG(error) << "crid not found in BidResponse: " << body << std::endl;
                                  recordError("unknown");
@@ -505,10 +529,12 @@ void HttpBidderInterface::sendBidErrorMessage(
     httpClientAdserverErrors->post(adserverErrorPath, callbacks, reqContent, {});
 }
 
+
 void HttpBidderInterface::sendBidDroppedMessage(
         const std::shared_ptr<const AgentConfig>& agentConfig,
         std::string const & agent, std::shared_ptr<Auction> const & auction)
 {
+	sendBidErrorMessage(agentConfig, agent, auction, "DROPPED");
 }
 
 void HttpBidderInterface::sendBidInvalidMessage(
@@ -516,18 +542,21 @@ void HttpBidderInterface::sendBidInvalidMessage(
         std::string const & agent, std::string const & reason,
         std::shared_ptr<Auction> const & auction)
 {
+	sendBidErrorMessage(agentConfig, agent, auction, "INVALID");
 }
 
 void HttpBidderInterface::sendNoBudgetMessage(
         const std::shared_ptr<const AgentConfig>& agentConfig,
         std::string const & agent, std::shared_ptr<Auction> const & auction)
 {
+	sendBidErrorMessage(agentConfig, agent, auction, "NOBUDGET");
 }
 
 void HttpBidderInterface::sendTooLateMessage(
         const std::shared_ptr<const AgentConfig>& agentConfig,
         std::string const & agent, std::shared_ptr<Auction> const & auction)
 {
+	sendBidErrorMessage(agentConfig, agent, auction, "TOOLATE");
 }
 
 void HttpBidderInterface::sendMessage(
@@ -538,7 +567,7 @@ void HttpBidderInterface::sendMessage(
 void HttpBidderInterface::sendErrorMessage(
         const std::shared_ptr<const AgentConfig>& agentConfig,
         std::string const & agent, std::string const & error,
-        std::vector<std::string> const & payload) {
+        std::vector<std::string> const & payload) {	
 }
 
 void HttpBidderInterface::sendPingMessage(
