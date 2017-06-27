@@ -18,6 +18,8 @@ namespace RTBKIT {
     Logging::Category OpenRTBBidRequestLogs::error("[ERROR] OpenRTB Bid Request Parser error", OpenRTBBidRequestLogs::trace);
     Logging::Category OpenRTBBidRequestLogs::trace22("OpenRTB Bid Request 2.2 Parser ");
     Logging::Category OpenRTBBidRequestLogs::error22("[ERROR] OpenRTB Bid Request Parser 2.2 error", OpenRTBBidRequestLogs::trace22);
+    Logging::Category OpenRTBBidRequestLogs::trace24("OpenRTB Bid Request 2.4 Parser ");
+    Logging::Category OpenRTBBidRequestLogs::error24("[ERROR] OpenRTB Bid Request Parser 2.4 error", OpenRTBBidRequestLogs::trace24);
 
     static DefaultDescription<OpenRTB::BidRequest> desc;
 
