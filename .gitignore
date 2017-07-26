@@ -23,3 +23,6 @@ bootstrap.json
 perf.data
 rtbkit/dox/html
 *.swp
+ola_rtbkit
+logs
+agent_gateway
