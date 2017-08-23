@@ -199,6 +199,8 @@ struct Auction : public std::enable_shared_from_this<Auction> {
         static void createDescription(AuctionResponseDescription&);
     };
 
+    bool pickRandomSpot();
+
     /** Modify the given response.  The boolean return code says whether or
         not this response was accepted (due to it being the maximum-priority
         response).

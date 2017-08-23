@@ -23,6 +23,8 @@
 #include <ace/High_Res_Timer.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <set>
+#include <iostream>
+#include <random>
 
 using namespace std;
 using namespace ML;
@@ -275,6 +277,12 @@ timeUsed(Date now) const
     return start.secondsUntil(now);
 }
 
+
+bool Auction::pickRandomSpot(){
+    static auto gen = std::bind(std::uniform_int_distribution<>(0,1),std::default_random_engine());
+    return gen();
+}
+
 Auction::WinLoss
 Auction::
 setResponse(int spotNum, Response newResponse)
@@ -323,9 +331,15 @@ setResponse(int spotNum, Response newResponse)
                     current->winningResponse(spotNum).price.maxPrice) {
                  std::swap(spot.front(), spot.back());
             }
-            else {
-                // Do nothing, whichever bid came first wins.
-            }
+            else if(newResponse.price.priority ==
+                    current->winningResponse(spotNum).price.priority &&
+                    newResponse.price.maxPrice ==
+                    current->winningResponse(spotNum).price.maxPrice){
+                // Same price and priority, pick a random bid
+                if(pickRandomSpot()){
+                    std::swap(spot.front(), spot.back());
+                }
+           }
 
             spot.back().localStatus = WinLoss::LOSS;
         }

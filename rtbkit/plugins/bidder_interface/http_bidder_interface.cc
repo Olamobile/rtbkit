@@ -426,6 +426,9 @@ void HttpBidderInterface::sendLossMessage(
         });
 
     Json::Value content;
+        content["agentName"] = agent;
+        content["bidRequestId"] = id;
+        content["msg"] = "Loss";
 
     HttpRequest::Content reqContent { content, "application/json" };
     httpClientAdserverEvents->post(adserverEventPath, callbacks, reqContent, {} /* queryParams */);
