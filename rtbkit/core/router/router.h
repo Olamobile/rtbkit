@@ -43,7 +43,6 @@ struct Banker;
 struct BudgetController;
 struct Accountant;
 struct BidderInterface;
-struct Analytics;
 
 /*****************************************************************************/
 /* AGENT INFO                                                                */
@@ -145,8 +144,11 @@ struct Router : public ServiceBase,
     /** Initialize the bidder interface. */
     void initBidderInterface(Json::Value const & json);
 
+    /** Initialize the augmentation loop interface. */
+    void initAugmentorInterface(Json::Value const & json);
+
     /** Initialize analytics if it is used. */
-    void initAnalyticsPublisher(const std::string & baseUrl, const int numConnections);
+    void initAnalytics(const std::string & baseUrl, const int numConnections);
 
     /** Initialize exchages from json configuration. */
     void initExchanges(const Json::Value & config);
@@ -154,11 +156,8 @@ struct Router : public ServiceBase,
     /** Initialize filters from json configuration. */
     void initFilters(const Json::Value & config = Json::Value::null);
 
-    /** Initialize analytics from json configuration. */
-    void initAnalytics(const Json::Value & config = Json::Value::null);
-
     /** Initialize all of the internal data structures and configuration. */
-    void init();
+    void init(const Json::Value& augmentorConfig = Json::Value::null);
 
     /** Bind to TCP/IP ports and publish where to connect to. */
     void bindTcp();
@@ -219,14 +218,11 @@ struct Router : public ServiceBase,
     */
     void connectExchange(ExchangeConnector & exchange)
     {
-        exchange.onNewAuction  = [=] (std::shared_ptr<Auction> a) {
-                        this->injectAuction(a, secondsUntilLossAssumed_); };
-        exchange.onAuctionDone = [=] (std::shared_ptr<Auction> a) {
-                        this->onAuctionDone(a); };
+        exchange.onNewAuction  = [=] (std::shared_ptr<Auction> a) { this->injectAuction(a, secondsUntilLossAssumed_); };
+        exchange.onAuctionDone = [=] (std::shared_ptr<Auction> a) { this->onAuctionDone(a); };
         exchange.onAuctionError = [=] (const std::string & channel,
                                        std::shared_ptr<Auction> auction,
-                                       const std::string message) {
-                        this->onAuctionError(channel, auction, message); };
+                                       const std::string message) { this->onAuctionError(channel, auction, message); };
     }
 
     /** Register the exchange with the router and make it take ownership of it */
@@ -406,7 +402,7 @@ struct Router : public ServiceBase,
      */
     virtual void submitToPostAuctionService(std::shared_ptr<Auction> auction,
                                             Id auctionId,
-                                            Auction::Response & bid);
+                                            const Auction::Response & bid);
 
 protected:
     // This thread contains the main router loop
@@ -629,7 +625,9 @@ public:
                         const std::string & exception,
                         Args... args)
     {
-        analyticsPublisher.publish("ROUTERERROR", Date::now().print(5),
+        logger.publish("ROUTERERROR", Date::now().print(5),
+                       function, exception, args...);
+        analytics.publish("ROUTERERROR", Date::now().print(5),
                        function, exception, args...);
         recordHit("error.%s", function);
     }
@@ -720,14 +718,30 @@ public:
     /** Log bids */
     bool logBids;
 
+    /** Log a given message to the given channel. */
+    template<typename... Args>
+    void logMessage(const std::string & channel, Args... args)
+    {
+        using namespace std;
+        //cerr << "********* logging message to " << channel << endl;
+        logger.publish(channel, Date::now().print(5), args...);
+    }
 
-    /** Log a given message to analyticsPublisher endpoint on given channel. */
+    /** Log a given message to analytics endpoint on given channel. */
     template<typename... Args>
     void logMessageToAnalytics(const std::string & channel, Args... args)
     {
-        analyticsPublisher.publish(channel, Date::now().print(5), args...);
+        analytics.publish(channel, Date::now().print(5), args...);
     }
 
+    /** Log a given message to the given channel. */
+    template<typename... Args>
+    void logMessageNoTimestamp(const std::string & channel, Args... args)
+    {
+        using namespace std;
+        //cerr << "********* logging message to " << channel << endl;
+        logger.publish(channel, args...);
+    }
 
     /*************************************************************************/
     /* DEBUGGING                                                             */
@@ -766,8 +780,8 @@ public:
 
     Date getCurrentTime() const { return Date::now(); }
 
-    std::unique_ptr<Analytics> analytics;
-    AnalyticsPublisher analyticsPublisher;
+    ZmqNamedPublisher logger;
+    AnalyticsPublisher analytics;
 
     /** Debug only */
     bool doDebug;

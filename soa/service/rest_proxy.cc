@@ -18,7 +18,7 @@ namespace Datacratic {
 
 RestProxy::
 RestProxy()
-    : operationQueue(1024),
+    : operationQueue(4096),
       numMessagesOutstanding_(0),
       currentOpId(1)
 {
@@ -30,7 +30,7 @@ RestProxy()
 
 RestProxy::
 RestProxy(const std::shared_ptr<zmq::context_t> & context)
-    : operationQueue(1024),
+    : operationQueue(4096),
       connection(context),
       numMessagesOutstanding_(0),
       currentOpId(1)

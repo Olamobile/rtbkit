@@ -425,13 +425,13 @@ void HttpBidderInterface::sendLossMessage(
               }
         });
 
-    Json::Value content;
-        content["agentName"] = agent;
-        content["bidRequestId"] = id;
-        content["msg"] = "Loss";
-
-    HttpRequest::Content reqContent { content, "application/json" };
-    httpClientAdserverEvents->post(adserverEventPath, callbacks, reqContent, {} /* queryParams */);
+    //Json::Value content;
+    //content["agentName"] = agent;
+    //content["bidRequestId"] = id;
+    //content["msg"] = "Loss";
+    //
+    //HttpRequest::Content reqContent { content, "application/json" };
+    //httpClientAdserverEvents->post(adserverEventPath, callbacks, reqContent, {} /* queryParams */);
 }
 
 void HttpBidderInterface::sendWinLossMessage(
@@ -494,10 +494,10 @@ void HttpBidderInterface::sendCampaignEventMessage(
     
     Json::Value content;
 
-        content["timestamp"] = event.timestamp.secondsSinceEpoch();
-        content["bidRequestId"] = event.auctionId.toString();
-        content["impid"] = event.impId.toString();
-        content["type"] = event.label;
+    content["timestamp"] = event.timestamp.secondsSinceEpoch();
+    content["bidRequestId"] = event.auctionId.toString();
+    content["impid"] = event.impId.toString();
+    content["type"] = event.label;
 
     HttpRequest::Content reqContent { content, "application/json" };
     httpClientAdserverEvents->post(adserverEventPath, callbacks, reqContent,

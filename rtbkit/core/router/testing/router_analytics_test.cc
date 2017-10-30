@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( zmq_analytics_test )
   
     
     Router router;
-    router.initAnalytics(analytics_config);
+    //router.initAnalytics(analytics_config);
     router.init();
     router.bindTcp();
     router.start();
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( zmq_analytics_test )
     // Necessary time for the subscriber to be ready to get messages 
     std::this_thread::sleep_for(std::chrono::seconds(1));
    
-    router.analytics->logErrorMessage(msg1, std::vector<std::string>{msg2});
+    router.logMessage("ERROR",msg1, std::vector<std::string>{msg2});
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
