@@ -13,6 +13,9 @@
 #include "soa/types/date.h"
 
 #include "standard_adserver_connector.h"
+#include <iostream>
+#include <fstream>
+#include <cmath>
 
 using namespace RTBKIT;
 
@@ -208,7 +211,9 @@ handleWinRq(const HttpHeader & header,
      */
     if (json.isMember("price")) {
         winPriceDbl = json["price"].asDouble();
-        winPrice = USD_CPM(winPriceDbl);
+        winPrice = USD_CPM(std::ceil(winPriceDbl*1000.0) / 1000.0);
+
+        //std::cout << "json[\"price\"] = " << json["price"] << " winPriceDbl = " << winPriceDbl << std::endl;
     } else {
         errorResponseHelper(response,
                             "MISSING_WINPRICE",
