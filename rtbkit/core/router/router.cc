@@ -34,6 +34,7 @@
 #include "rtbkit/common/win_cost_model.h"
 #include "rtbkit/common/bidder_interface.h"
 #include "rtbkit/common/analytics.h"
+#include <random>
 
 using namespace std;
 using namespace ML;
@@ -122,7 +123,7 @@ Router(ServiceBase & parent,
     : ServiceBase(serviceName, parent),
       shutdown_(false),
       postAuctionEndpoint(*this),
-      configBuffer(1024),
+      configBuffer(10240),
       exchangeBuffer(64),
       startBiddingBuffer(65536),
       submittedBuffer(65536),
@@ -1487,6 +1488,20 @@ augmentAuction(const std::shared_ptr<AugmentationInfo> & info)
                              onDoneAugmenting);
 }
 
+
+std::vector<int> pickRandom(int max_number, int size){
+    std::random_device rd;
+    std::mt19937 gen{rd()};
+    std::uniform_int_distribution<int> dis{0, max_number};
+
+    std::vector<int> randomValues;
+    for(int i = 0; i < size; i++){
+        randomValues.push_back(dis(gen));
+    }
+
+    return randomValues;
+}
+
 std::shared_ptr<AugmentationInfo>
 Router::
 preprocessAuction(const std::shared_ptr<Auction> & auction)
@@ -1544,8 +1559,24 @@ preprocessAuction(const std::shared_ptr<Auction> & auction)
                 });
     }
 
+
+    FilterPool::ConfigList biddableConfigs;
     // Do the actual filtering.
-    auto biddableConfigs = filters.filter(*auction->request, exchangeConnector);
+    auto biddableConfigs_full = filters.filter(*auction->request, exchangeConnector);
+    int maxAgents = 5;
+
+    if(!biddableConfigs_full.empty() && biddableConfigs_full.size() > maxAgents){
+        std::vector<int> agentsPos = pickRandom((biddableConfigs_full.size()-1), maxAgents);
+        auto last = std::unique(agentsPos.begin(), agentsPos.end());
+        agentsPos.erase(last, agentsPos.end());
+        for(auto i : agentsPos){
+            biddableConfigs.push_back(biddableConfigs_full.at(i));
+        }
+    }
+    else{
+        biddableConfigs = biddableConfigs_full;
+    }
+
 
     auto checkAgent = [&] (
             const AgentConfig & config,
