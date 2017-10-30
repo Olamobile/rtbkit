@@ -110,7 +110,7 @@ struct SlaveBanker : public Banker, public MessageLoop {
     SlaveBanker(const std::string & accountSuffix,
             CurrencyPool spendRate = DefaultSpendRate,
             double syncRate = 1.0,
-            bool batchedUpdates = false);
+            bool batchedUpdates = true);
 
     /** Initialize the slave banker.  
 
@@ -122,7 +122,7 @@ struct SlaveBanker : public Banker, public MessageLoop {
     void init(const std::string & accountSuffix,
               CurrencyPool spendRate = DefaultSpendRate,
               double syncRate = 1.0,
-              bool batchedUpdates = false);
+              bool batchedUpdates = true);
 
     /** Notify the banker that we're going to need to be spending some
         money for the given account.  We also keep track of how much
@@ -335,7 +335,7 @@ public:
     struct Defaults {
         static const std::string SpendRate;
         static constexpr double SyncRate = 1.0;
-        static constexpr bool Batched = false;
+        static constexpr bool Batched = true;
 
         static constexpr bool UseHttp = false;
         static constexpr int HttpConnections = 128;
